@@ -19,4 +19,4 @@ worlds from the pre-Disney Expanded Universe. Sorry, Mickey. You can't replace t
 
 
 
-<img src="https://github.com/geoJaSON/The-Star-Wars-Galaxy/blob/main/The%20Star%20Wars%20Galaxy.jpg?raw=true" alt="The Galaxy Far, Far Away">
+<img src="https://github.com/geoJaSON/The-Star-Wars-Galaxy/blob/main/the_galaxy_far_far_away.jpg?raw=true?raw=true" alt="The Galaxy Far, Far Away">
