@@ -14,6 +14,9 @@ make more sense to me as being linear with sharp turns, rather than the smooth c
 
 The symbol sizes were derived from the many books I have on my shelf as well as a lot of referrals to Wookiepedia.\
 
+The planet descriptions were grabbed from their respective Wookiepedia pages using the great method invented here:
+https://github.com/dennisbakhuis/wookieepediascience
+
 Long story short, I'm putting the shapefile I've compiled for this project up here for the whole fandom to use and edit to their own content. And yes, this map only includes
 worlds from the pre-Disney Expanded Universe. Sorry, Mickey. You can't replace the stories I grew up with.
 
