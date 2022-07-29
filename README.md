@@ -2,7 +2,7 @@
 
 Hello Everyone!
 
-This was a pet project of mine to prep something for the Esri UC Map Gallery. I thought it would be nice to show off something that wasn't work related for once.
+This was a pet project of mine to prep a map for the Esri UC Map Gallery. I thought it would be nice to show off something that wasn't work related for once.
 
 To begin, I took advantage of the planets listed here:
 https://www.starwars.com/wp-content/uploads/sites/6/2014/06/atlas-appendix.pdf
