@@ -1,0 +1,540 @@
+import random
+import time
+try:
+    class Weapon:
+        def __init__(self, name, damage, effect=None, cooldown=0):
+            self.name = name
+            self.damage = damage
+            self.effect = effect
+            self.cooldown = cooldown
+            self.current_cooldown = 0
+
+        def __str__(self):
+            return f"{self.name} (Damage: {self.damage}, Effect: {self.effect if self.effect else 'None'}, Cooldown: {self.cooldown})"
+
+        def apply_effect(self, attacker, defender):
+            if self.effect == "ion_cannon":
+                if not defender.captain or not defender.captain.negate_ion_cannon():
+                    defender.skip_turn = True
+            elif self.effect == "missile_barrage":
+                for _ in range(5):
+                    hit = random.randint(0, 100) < attacker.accuracy - defender.maneuverability
+                    if hit:
+                        damage = self.damage
+                        defender.take_damage(damage)
+                        print(f"{attacker.name} attacks {defender.name} with {self.name} for {damage} damage.")
+                print(f"{attacker.name} barrages {defender.name} with {self.name}.")
+            elif self.effect == "tractor_beam":
+                defender.maneuverability = 0
+                defender.tractor_beam_turns = 2
+                print(f"{defender.name}'s evasion is reduced to 0% for the next 2 turns due to the Tractor Beam.")
+
+    class Captain:
+        def __init__(self, name, ability, ability_message, reference):
+            self.name = name
+            self.ability = ability
+            self.ability_message = ability_message
+            self.reference = reference
+            self.turn_counter = 0
+            self.effects = ["always_hit", "evade_hit", "extra_attack", "fill_turn_gauge", "negate_ion_cannon", "critical_hit"]
+            self.current_effect = None
+            if self.ability == "random_effect":
+                self.current_effect = random.choice(self.effects)
+
+        def use_ability(self, ship, attacker=None, defender=None):
+            self.turn_counter += 1
+            if self.ability == "random_effect" and self.turn_counter % 2 == 0:
+                self.current_effect = random.choice(self.effects)
+                print(f"{self.name} rolls the dice! Gets {self.current_effect} effect!")
+
+            effective_ability = self.current_effect if self.ability == "random_effect" else self.ability
+
+            if effective_ability == "always_hit" and random.random() < 0.5:
+                print(self.ability_message)
+                return True
+            elif effective_ability == "evade_hit" and random.random() < 0.5:
+                print(f"{self.ability_message} {attacker.name} misses the attack on {ship.name}.")
+                return False
+            elif effective_ability == "extra_attack" and random.random() < 0.5:
+                print(self.ability_message)
+                if defender:
+                    defender.take_damage(ship.attack_power * 0.5)
+                    
+            elif effective_ability == "fill_turn_gauge" and random.random() < 0.5:
+                ship.turn_gauge = 10
+                print(self.ability_message)
+            elif effective_ability == "negate_ion_cannon" and random.random() < 0.5:
+                print(self.ability_message)
+                return True
+            elif effective_ability == "critical_hit" and random.random() < 0.5:
+                print(self.ability_message)
+                return True
+            elif effective_ability == "armor_drain" and defender:
+                defender.armor_drain_turns = 3  # Drain armor for 3 turns
+                print(f"{self.name} uses {self.ability_message} on {defender.name}!")
+            elif effective_ability == "energy_drain" and defender:
+                defender.energy_drain_turns = 3  # Drain energy for 3 turns
+                print(f"{self.name} uses {self.ability_message} on {defender.name}!")
+            elif effective_ability == "berserk" and ship and random.random() < 0.1:
+                ship.activate_berserk()
+            return None
+
+        def negate_ion_cannon(self):
+            effective_ability = self.current_effect if self.ability == "random_effect" else self.ability
+            return effective_ability == "negate_ion_cannon" and random.random() < 0.3
+
+
+    class Ship:
+        def __init__(self, name, shields, armor, attack_power, weapons, accuracy, maneuverability, speed, energy, shield_recharge_rate, critical_hit_chance, captain=None, wingman=None):
+            self.name = name
+            self.shields = shields
+            self.armor = armor
+            self.attack_power = attack_power
+            self.weapons = weapons
+            self.accuracy = accuracy
+            self.maneuverability = maneuverability
+            self.speed = speed
+            self.energy = energy
+            self.max_energy = energy
+            self.shield_recharge_rate = shield_recharge_rate
+            self.critical_hit_chance = critical_hit_chance
+            self.turn_gauge = 0
+            self.skip_turn = False
+            self.captain = captain
+            self.wingman = wingman
+            self.tractor_beam_turns = 0
+            self.armor_drain_turns = 0
+            self.energy_drain_turns = 0
+            self.berserk_turns = 0
+            
+        def take_damage(self, damage):
+            if self.shields >= damage:
+                self.shields -= damage
+            else:
+                remaining_damage = damage - self.shields
+                self.shields = 0
+                self.armor -= remaining_damage
+
+        def is_destroyed(self):
+            return self.armor <= 0
+
+        def recharge_shields(self):
+            self.shields = min(self.shields + self.shield_recharge_rate * self.shields, self.shields)
+
+        def drain_armor(self):
+            if self.armor_drain_turns > 0:
+                drain_amount = self.armor * 0.01
+                self.armor -= drain_amount
+                self.armor_drain_turns -= 1
+                print(f"{self.name} suffers {drain_amount:.2f} armor drain due to the effect.")
+
+        def drain_energy(self):
+            if self.energy_drain_turns > 0:
+                drain_amount = self.energy * 0.05  # Drains 5% of current energy
+                self.energy -= drain_amount
+                self.energy_drain_turns -= 1
+                print(f"{self.name} suffers {drain_amount:.2f} energy drain due to the effect.")
+
+        def repair(self):
+            energy_cost = 20
+            repair_amount = 10
+            if self.energy >= energy_cost:
+                self.energy -= energy_cost
+                self.armor += repair_amount
+                print(f"{self.name} repairs {repair_amount} armor, costing {energy_cost} energy.")
+            else:
+                print(f"{self.name} does not have enough energy to repair.")
+
+        def activate_berserk(self):
+            self.berserk_turns = 3
+            print(f"{self.name} enters berserk mode! Increased attack power but reduced accuracy and defense.")
+
+        def apply_berserk_effects(self):
+            if self.berserk_turns > 0:
+                self.attack_power *= 1.5
+                self.accuracy *= 0.75
+                self.maneuverability *= 0.75
+                self.berserk_turns -= 1
+                print(f"{self.name} is in berserk mode! Attack power: {self.attack_power}, Accuracy: {self.accuracy}, Maneuverability: {self.maneuverability}")
+
+
+        def reset_berserk_effects(self):
+            if self.berserk_turns == 0:
+                self.attack_power /= 1.5
+                self.accuracy /= 0.75
+                self.maneuverability /= 0.75
+
+        def boost_shields(self):
+            energy_cost = 15
+            shield_boost = 20
+            if self.energy >= energy_cost:
+                self.energy -= energy_cost
+                self.shields += shield_boost
+                print(f"{self.name} boosts shields by {shield_boost}, costing {energy_cost} energy.")
+            else:
+                print(f"{self.name} does not have enough energy to boost shields.")
+
+        def __str__(self):
+            return (f"{self.name} - Shields: {self.shields}, Armor: {self.armor}, "
+                    f"Attack Power: {self.attack_power}, Captain: {self.captain.name if self.captain else 'None'}, "
+                    f"Wingman: {self.wingman.name if self.wingman else 'None'}, "
+                    f"Accuracy: {self.accuracy}, Maneuverability: {self.maneuverability}, Speed: {self.speed}, "
+                    f"Energy: {self.energy}/{self.max_energy}, Shield Recharge Rate: {self.shield_recharge_rate}, Critical Hit Chance: {self.critical_hit_chance}")
+
+    class Team:
+        def __init__(self, name):
+            self.name = name
+            self.ships = []
+
+        def add_ship(self, ship):
+            self.ships.append(ship)
+
+        def is_defeated(self):
+            return all(ship.is_destroyed() for ship in self.ships)
+
+        def __str__(self):
+            return f"Team {self.name}:\n" + "\n".join(str(ship) for ship in self.ships)
+
+    def choose_option(options, prompt):
+        print(prompt)
+        for idx, option in enumerate(options, 1):
+            print(f"{idx}. {option}")
+        choice = int(input("Choose an option: ")) - 1
+        return options[choice]
+
+    def battle(attacker_ship, defender_ship, weapon):
+        hit_chance = attacker_ship.accuracy - defender_ship.maneuverability
+        if attacker_ship.captain and attacker_ship.captain.use_ability(attacker_ship, attacker=True):
+            hit = True
+        else:
+            hit = random.randint(0, 100) < hit_chance
+
+        if hit:
+            critical_hit = attacker_ship.captain and attacker_ship.captain.use_ability(attacker_ship) or random.randint(0, 100) < attacker_ship.critical_hit_chance
+            base_damage = weapon.damage * (2 if critical_hit else 1)
+            if weapon.effect == "concussion_missile":
+                damage_to_shields = base_damage * 0.5
+                damage_to_armor = base_damage * 1.5
+                if defender_ship.shields >= damage_to_shields:
+                    defender_ship.shields -= damage_to_shields
+                else:
+                    remaining_damage = damage_to_shields - defender_ship.shields
+                    defender_ship.shields = 0
+                    defender_ship.armor -= remaining_damage * 1.5
+                defender_ship.armor -= damage_to_armor
+                print(f"{attacker_ship.name} attacks {defender_ship.name} with {weapon.name}, dealing {damage_to_shields} damage to shields and {damage_to_armor} damage to armor.")
+            else:
+                damage = base_damage
+                defender_ship.take_damage(damage)
+                print(f"{attacker_ship.name} attacks {defender_ship.name} with {weapon.name} for {damage} damage.")
+            
+            if critical_hit:
+                print("It's a critical hit!")
+            if weapon.effect and weapon.effect != "concussion_missile":
+                weapon.apply_effect(attacker_ship, defender_ship)
+                print(f"{defender_ship.name} is affected by {weapon.name}.")
+            if defender_ship.is_destroyed():
+                print(f"{defender_ship.name} is destroyed!")
+            if attacker_ship.captain:
+                attacker_ship.captain.use_ability(attacker_ship, defender=defender_ship)
+            if attacker_ship.wingman:
+                attacker_ship.wingman.use_ability(attacker_ship, defender=defender_ship)
+        else:
+            print(f"{attacker_ship.name} misses the attack on {defender_ship.name}.")
+
+    def print_progress_bar(ship, team_name):
+        bar_length = 20
+        progress = min(int((ship.turn_gauge / 10) * bar_length), bar_length)
+        bar = "|" + "-" * progress + " " * (bar_length - progress) + "|"
+        print(f"{team_name} Turn - {ship.name}: {bar} {ship.turn_gauge:.2f}")
+
+    def game_loop(team1, team2):
+        turn = 0
+        UP = "\x1B[2J\x1B[H"
+        while not team1.is_defeated() and not team2.is_defeated():
+            # print(f"{UP}")
+            # print(team1)
+            # print(team2)
+            
+            for team in [team1, team2]:
+                for ship in team.ships:
+                    if not ship.is_destroyed():
+                        ship.turn_gauge += ship.speed / 10
+                        ship.recharge_shields()
+                        if ship.tractor_beam_turns > 0:
+                            ship.tractor_beam_turns -= 1
+                            if ship.tractor_beam_turns == 0:
+                                ship.maneuverability = original_maneuverability[ship.name]
+                                print(f"{ship.name}'s evasion returns to normal.")
+                        ship.drain_armor()
+                        ship.drain_energy()
+
+            for team in [team1, team2]:
+                for ship in team.ships:
+                    if not ship.is_destroyed():
+                        print_progress_bar(ship, team.name)
+
+            ready_ships = [(ship, team) for team in [team1, team2] for ship in team.ships if ship.turn_gauge >= 10 and not ship.is_destroyed() and not ship.skip_turn]
+
+            if ready_ships:
+                print(team1)
+                print(team2)
+                ready_ships.sort(key=lambda x: x[0].turn_gauge, reverse=True)
+                attacker_ship, attacker_team = ready_ships[0]
+                attacker_ship.turn_gauge -= 10
+                
+                defender_team = team1 if attacker_team == team2 else team2
+                defender_ship = random.choice([ship for ship in defender_team.ships if not ship.is_destroyed()])
+                
+                print(f"\n{attacker_team.name}'s turn")
+                
+                
+                options = [weapon.name for weapon in attacker_ship.weapons] + ["Repair", "Boost Shields"]
+
+                choice = choose_option(options, f"Choose an action for {attacker_ship.name}:")
+
+                if choice == "Repair":
+                    attacker_ship.repair()
+                elif choice == "Boost Shields":
+                    attacker_ship.boost_shields()
+                else:
+                    weapon = next(weapon for weapon in attacker_ship.weapons if weapon.name == choice)
+                    battle(attacker_ship, defender_ship, weapon)
+                
+                if attacker_ship.skip_turn:
+                    attacker_ship.skip_turn = False
+
+
+            else:
+                time.sleep(.2)  # Add a small delay for readability
+
+            turn += 1
+
+        if team1.is_defeated():
+            print(f"{team2.name} wins!")
+        else:
+            print(f"{team1.name} wins!")
+
+    def choose_team():
+        print("Choose your team:")
+        team_names = list(teams.keys())
+        for idx, team_name in enumerate(team_names, 1):
+            print(f"{idx}. {team_name}")
+        choice = int(input("Choose an option: ")) - 1
+        return team_names[choice]
+
+    def choose_option(options, prompt):
+        print(prompt)
+        for idx, option in enumerate(options, 1):
+            print(f"{idx}. {option}")
+        choice = int(input("Choose an option: ")) - 1
+        return options[choice]
+
+    def display_references():
+        for team_name, team_info in teams.items():
+            print(f"\nTeam: {team_name}")
+            print("Captains:")
+            for captain_name, captain in team_info["captains"].items():
+                print(f"  - {captain_name}: {captain.reference}")
+            print("Ships:")
+            for ship_name, ship in team_info["ships"].items():
+                print(f"  - {ship_name}: Shields: {ship.shields}, Armor: {ship.armor}, Attack: {ship.attack_power}, Speed: {ship.speed}, Shield Recharge Rate: {ship.shield_recharge_rate}, Critical Hit Chance: {ship.critical_hit_chance}")
+
+    def how_to_play():
+        print("\nHow to Play:")
+        print("1. Choose your team, captain, wingman, and ship. Your wingman will provide a passive bonus.")
+        print("2. During your turn, choose an action: attack, repair, or boost shields.")
+        print("3. Different ships have different weapons, some with special effects.")
+        print("4. The goal is to destroy the ship of the opposing team.")
+
+    def pre_game_setup():
+        print("******************************************")
+        print("*          Star Wars Tactics:            *")
+        print("*           Captain's Duel!              *")
+        print("******************************************\n")
+
+        while True:
+            options = ["How to Play", "Reference", "Start"]
+            choice = choose_option(options, "Choose an option:")
+            
+            if choice == "How to Play":
+                how_to_play()
+            elif choice == "Reference":
+                display_references()
+            elif choice == "Start":
+                break
+
+        print("Player 1, choose your team:")
+        team1_name = choose_team()
+        team1_captains = teams[team1_name]["captains"]
+        team1_ships = teams[team1_name]["ships"]
+
+        print("Choose Captain for Player 1:")
+        captain1_name = choose_option(list(team1_captains.keys()), "Available Captains:")
+        captain1 = team1_captains[captain1_name]
+
+        print("Choose Wingman for Player 1:")
+        wingman1_name = choose_option(list(team1_captains.keys()), "Available Wingmen:")
+        wingman1 = team1_captains[wingman1_name]
+
+        print("Choose Ship for Player 1:")
+        ship1_name = choose_option(list(team1_ships.keys()), "Available Ships:")
+        ship1 = team1_ships[ship1_name]
+        ship1.captain = captain1
+        ship1.wingman = wingman1
+
+        # Select team for Player 2
+        print("Player 2, choose your team:")
+        team2_name = choose_team()
+        team2_captains = teams[team2_name]["captains"]
+        team2_ships = teams[team2_name]["ships"]
+
+        print("Choose Captain for Player 2:")
+        captain2_name = choose_option(list(team2_captains.keys()), "Available Captains:")
+        captain2 = team2_captains[captain2_name]
+
+        print("Choose Wingman for Player 2:")
+        wingman2_name = choose_option(list(team2_captains.keys()), "Available Wingmen:")
+        wingman2 = team2_captains[wingman2_name]
+
+        print("Choose Ship for Player 2:")
+        ship2_name = choose_option(list(team2_ships.keys()), "Available Ships:")
+        ship2 = team2_ships[ship2_name]
+        ship2.captain = captain2
+        ship2.wingman = wingman2
+
+        # Add ships to teams
+        team1 = Team(team1_name)
+        team2 = Team(team2_name)
+        team1.add_ship(ship1)
+        team2.add_ship(ship2)
+
+        original_maneuverability = {ship.name: ship.maneuverability for ship in team1.ships}
+        original_maneuverability.update({ship.name: ship.maneuverability for ship in team2.ships})
+
+        return team1, team2, original_maneuverability
+
+    if __name__ == "__main__":
+
+        blasters = Weapon("Blasters", 10)
+        ion_cannon = Weapon("Ion Cannon", 5, effect="ion_cannon")
+        torpedos = Weapon("Proton Torpedos", 15)
+        tractor_beam = Weapon("Tractor Beam", 0, effect="tractor_beam")
+        concussion_missile = Weapon("Concussion Missile", 20, effect="concussion_missile")
+        turbolasers = Weapon("Turbolasers", 25)
+        missile_barrage = Weapon("Missile Barrage", 3, effect="missile_barrage")
+
+
+        # Define teams
+        teams = {
+            "Rebel Alliance": {
+                "captains": {
+                    "Luke Skywalker": Captain("Luke Skywalker", "always_hit", "Luke Skywalker used the Force! Bonus accuracy!",'Force Guidance- chance to turn a missed attack into a hit.'),
+                    "Han Solo": Captain("Han Solo", "evade_hit", "Han Solo used some maneuvers! Bonus evasion!",'Few Surprises Left- chance to turn a hit into a miss.'),
+                    "Wedge Antilles": Captain("Wedge Antilles", "fill_turn_gauge", "Wedge Antilles accelerates to attack speed! Bonus turn!",'Attack Speed! - Chance to fill his turn gauge.'),
+                    "Admiral Ackbar": Captain("Admiral Ackbar", "negate_ion_cannon", "Admiral Ackbar senses a trap! Ion cannon evaded!",'It\'s a trap! -chance to evade the ion cannon.'),
+                    "Lando Calrissian": Captain("Lando Calrissian", "random_effect", "Lando Calrissian rolls the dice!",'Lady Luck- will occasionally roll the dice to gain a random effect for 2 turns.'),
+                },
+                "ships": {
+                    "X-Wing": Ship("X-Wing", 30, 20, 10, [blasters, torpedos], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    "Y-Wing": Ship("Y-Wing", 25, 30, 15, [ion_cannon, blasters], accuracy=70, maneuverability=50, speed=5, energy=100, shield_recharge_rate=0.05, critical_hit_chance=5),
+                    "Corellian Corvette": Ship("Corellian Corvette", 40, 40, 20, [ion_cannon, torpedos], accuracy=75, maneuverability=55, speed=6, energy=100, shield_recharge_rate=0.08, critical_hit_chance=8),
+                    "Millennium Falcon": Ship("Millennium Falcon", 35, 35, 25, [blasters, concussion_missile], accuracy=85, maneuverability=65, speed=8, energy=100, shield_recharge_rate=0.12, critical_hit_chance=12),
+                    'Nebulon-B Frigate': Ship('Nebulon-B Frigate', 30, 20, 10, [blasters, ion_cannon], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    'MC80 Star Cruiser': Ship('MC80 Star Cruiser', 30, 20, 10, [blasters, ion_cannon], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+
+                }
+            },
+            "Galactic Empire": {
+                "captains": {
+                    "Emperor\'s Hand Mara Jade": Captain("Emperor\'s Hand Mara Jade", "extra_attack", "Mara Jade hears the Emporer\s voice! Bonus blaster shots!",'The Last Command- chance for a bonus attack.'),
+                    "Darth Vader": Captain("Darth Vader", "critical_hit", "Darth Vader has you now! Bonus Critical hit!",'Ruthless Pursuit- chance for a critical hit.'),
+                    "Maarek Stele": Captain("Maarek Stele", "always_evade", "Maarek Stele's piloting skills evade the attack! Bonus evasion!",'Hero of the Empire- chance to evade an attack.'),
+                    "Admiral Piett": Captain("Admiral Piett", "fill_turn_gauge", "Admiral Piett's orders earn a bonus turn!",'Imperial Admiralty- chance to fill his turn gauge.'),
+                    "Admiral Zaarin": Captain("Admiral Zaarin", "random_effect", "Admiral Zaarin experiments with new technology!",'R&D- experiments with new tech to gain a random effect for 2 turns.'),
+                },
+                "ships": {
+                    "TIE Fighter": Ship("TIE Fighter", 0, 20, 10, [blasters,], accuracy=80, maneuverability=80, speed=15, energy=100, shield_recharge_rate=0.0, critical_hit_chance=10),
+                    "TIE Bomber": Ship("TIE Bomber", 10, 30, 15, [concussion_missile, blasters], accuracy=70, maneuverability=50, speed=7, energy=100, shield_recharge_rate=0.05, critical_hit_chance=5),
+                    "Imperial-I Star Destroyer": Ship("Imperial-I Star Destroyer", 40, 40, 20, [ion_cannon, torpedos, tractor_beam], accuracy=75, maneuverability=55, speed=6, energy=100, shield_recharge_rate=0.08, critical_hit_chance=8),
+                    "TIE Interceptor": Ship("TIE Interceptor", 35, 35, 25, [blasters, ion_cannon], accuracy=85, maneuverability=65, speed=8, energy=100, shield_recharge_rate=0.12, critical_hit_chance=12),
+                }
+            },
+            
+            "Bounty Hunters": {
+                "captains": {
+                    "Boba Fett": Captain("Boba Fett", "fill_turn_gauge", "Boba Fett's Slave I is ready to attack! Bonus turn!",''),
+                    "IG-88": Captain("IG-88", "negate_ion_cannon", "IG-88's droid brain negates the ion cannon!",''),
+                    "Bossk": Captain("Bossk", "critical_hit", "Bossk's Trandoshan instincts lead to a critical hit!",''),
+                },
+                "ships": {
+                    "Slave I": Ship("Slave I", 30, 35, 15, [blasters, ion_cannon], accuracy=70, maneuverability=50, speed=5, energy=100, shield_recharge_rate=0.1, critical_hit_chance=5),
+                    "IG-2000": Ship("IG-2000", 35, 25, 10, [torpedos, blasters], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    "Hound's Tooth": Ship("Hound's Tooth", 40, 40, 20, [ion_cannon, torpedos], accuracy=75, maneuverability=55, speed=6, energy=100, shield_recharge_rate=0.08, critical_hit_chance=8)
+                }
+            },
+            "Smugglers": {
+                "captains": {
+                    "Mara Jade": Captain("Mara Jade", "extra_attack", "Mara Jade sneak attacks! Bonus blaster shots!",'Surprise and Improvise- chance for a bonus attack.'),
+                    "Dash Rendar": Captain("Dash Rendar", "always_hit", "Lando Calrissian's luck is with you! Bonus accuracy!",''),
+                    "Talon Karrde": Captain("Talon Karrde", "evade_hit", "Chewbacca's roar distracts the enemy! Bonus evasion!",''),
+                    "Booster Terrick": Captain("Booster Terrick", "fill_turn_gauge", "Jabba the Hutt's bounty hunters are ready to attack! Bonus turn!",''),
+                },
+                "ships": {
+                    "Jade Fire": Ship("Jade Fire", 30, 20, 10, [blasters, ion_cannon], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    "Wild Karrde": Ship("Wild Karrde", 35, 35, 25, [blasters, concussion_missile], accuracy=85, maneuverability=65, speed=8, energy=100, shield_recharge_rate=0.12, critical_hit_chance=12),
+                    "Outrider": Ship("Outrider", 30, 35, 15, [blasters, ion_cannon], accuracy=70, maneuverability=50, speed=5, energy=100, shield_recharge_rate=0.1, critical_hit_chance=5),
+                    "Errant Venture": Ship("Errant Venture", 35, 25, 10, [torpedos, blasters, tractor_beam], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10)
+                }
+            },
+            'New Republic': {
+                'captains': {
+                    'Jedi Master Luke Skywalker': Captain('Jedi Master Luke Skywalker', 'always_hit', 'Jedi Master Luke Skywalker uses the Force! Bonus accuracy!',''),
+                    'Leia Organa Solo': Captain('Leia Organa Solo', 'evade_hit', 'Leia Organa Solo uses her diplomatic skills! Bonus evasion!','New Republic Diplomacy - chance to evade an attack.'),
+                    'Jedi Knight Mara Jade': Captain('Jedi Knight Mara Jade', 'fill_turn_gauge', 'Jedi Knight Mara Jade accelerates to attack speed! Bonus turn!',''),
+                    'Kyle Katarn': Captain('Kyle Katarn', 'fill_turn_gauge', 'Kyle Katarn takes advantage of Jedi training! Bonus turn!','Jedi Inititave - chance to fill his turn gauge.'),
+                    'Garm bel Iblis': Captain('Garm bel Iblis', 'negate_ion_cannon', 'Garm bel Iblis\'s cunning avoids the ion cannon!','Original Rebel - chance to negate the ion cannon.'),
+                    'Corran Horn': Captain('Corran Horn', 'always_hit', 'Corran Horn\'s concentration ensures a hit!','Rogue Squadron Training - chance to always hit.'),
+                    'Commander Wedge Antilles': Captain('Commander Wedge Antilles', 'extra_attack', 'Commander Wedge Antilles\'s calls on Rogue Squadron!','Rogue Squadron - chance for a bonus attack.'),
+                },
+                'ships': {
+                    'E-Wing': Ship('E-Wing', 30, 20, 10, [blasters, ion_cannon], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    'V-Wing': Ship('V-Wing', 25, 30, 15, [torpedos, blasters], accuracy=70, maneuverability=50, speed=5, energy=100, shield_recharge_rate=0.05, critical_hit_chance=5),
+                    'Dreadnaught Heavy Cruiser': Ship('Dreadnaught Heavy Cruiser', 35, 35, 25, [blasters, concussion_missile], accuracy=85, maneuverability=65, speed=8, energy=100, shield_recharge_rate=0.12, critical_hit_chance=12),
+                    'Nebula Star Destroyer': Ship('Nebula Star Destroyer', 40, 40, 20, [missile_barrage, torpedos], accuracy=75, maneuverability=55, speed=6, energy=100, shield_recharge_rate=0.08, critical_hit_chance=8), #incredibly slow, inaccurate, but powerful
+                }
+            },
+            'Imperial Remnant': {
+                'captains': {
+                    'Captain Gilad Pellaeon': Captain('Gilad Pellaeon', 'fill_turn_gauge', 'Gilad Pellaeon\'s tactical genius earns a bonus turn!','Nobl'),
+                    "Grand Admiral Thrawn": Captain("Grand Admiral Thrawn", "fill_turn_gauge", "Grand Admiral Thrawn's a tactical genius! Bonus turn!",'Five Steps Ahead - chance to fill his turn gauge.'),
+                    "Baron Soonir Fel": Captain("Baron Soontir Fel", "always_hit", "Baron Soontir Fel's piloting skills cements the attack!",'Feared Ace - chance to always hit.'),
+
+                },
+                'ships': {
+                    'Imperial-II Star Destroyer': Ship('Imperial-II Imperial Star Destroyer', 35, 35, 20, [ion_cannon, torpedos, tractor_beam], accuracy=75, maneuverability=55, speed=6, energy=100, shield_recharge_rate=0.08, critical_hit_chance=8),
+                    'TIE Defender': Ship('TIE Defender', 35, 35, 25, [blasters, ion_cannon], accuracy=85, maneuverability=65, speed=8, energy=100, shield_recharge_rate=0.12, critical_hit_chance=12), 
+                    'Immobilizer Cruiser': Ship('Immobilizer Cruiser', 30, 20, 10, [blasters, ion_cannon, tractor_beam], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10), #focuses on disabling enemy ships
+                },
+            'Warlords': {
+                'captains': {
+                    'Zsinj': Captain('Zsinj', 'fill_turn_gauge', 'Warlord Zsinj\'s ambition earns a bonus turn!','Ruthless Ambition - chance to fill his turn gauge.'),
+                    'Ysanne Isard': Captain('Ysanne Isard', 'armor_drain', 'Ysanne Isard deploys the Krytos plague! Enegy armor drain!','Krytos Plague - chance to drain opponent\'s armor for 3 turns.'),
+                    'Admiral Daala': Captain('Admiral Daala', 'berserk', 'Admiral Daala unleashes fury!','Mass Execution - chance to enter berserk mode.'),
+                },
+                'ships': {
+                    'TIE Interceptor': Ship('TIE Interceptor', 30, 20, 10, [blasters, ion_cannon], accuracy=80, maneuverability=60, speed=7, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    'Iron Fist': Ship('Iron Fist', 30, 20, 10, [blasters, torpedos], accuracy=80, maneuverability=60, speed=4, energy=100, shield_recharge_rate=0.1, critical_hit_chance=10),
+                    'Lusankya': Ship('Lusankya', 40, 40, 30, [concussion_missile, turbolasers], accuracy=70, maneuverability=50, speed=3, energy=100, shield_recharge_rate=0.05, critical_hit_chance=5) #incredibly slow, inaccurate, but powerful
+                    }
+                } 
+            }
+        }
+        team1, team2, original_maneuverability = pre_game_setup()
+        game_loop(team1, team2)
+except Exception as e:
+    # print traceback
+    import traceback
+    traceback.print_exc()
+    
+    input("Press Enter to exit...")
