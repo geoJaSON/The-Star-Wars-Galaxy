@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Galaxy Far, Far Away...</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: #000;
+            color: #00d4ff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main container */
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Side panel */
+        .side-panel {
+            width: 320px;
+            background: linear-gradient(180deg, #0a0a12 0%, #050508 100%);
+            border-right: 3px solid #c41e3a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .side-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -6px;
+            width: 3px;
+            height: 100%;
+            background: #00d4ff;
+            opacity: 0.3;
+        }
+
+        /* Title section */
+        .title-section {
+            padding: 20px;
+            border-bottom: 2px solid #c41e3a;
+            background: linear-gradient(180deg, #1a0a0a 0%, #0a0a12 100%);
+        }
+
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #c41e3a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #c41e3a, 0 0 20px #c41e3a;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+
+        /* Legend section */
+        .legend-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a3a4a;
+        }
+
+        .legend-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: #00d4ff;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 3px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-line.major {
+            background: #00d4ff;
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        .legend-line.minor {
+            background: #4a7a8a;
+            height: 2px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .legend-dot.core { background: #ffd700; box-shadow: 0 0 6px #ffd700; }
+        .legend-dot.colonies { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+        .legend-dot.inner-rim { background: #00d4ff; box-shadow: 0 0 6px #00d4ff; }
+        .legend-dot.expansion { background: #ff6b00; box-shadow: 0 0 6px #ff6b00; }
+        .legend-dot.mid-rim { background: #ff00ff; box-shadow: 0 0 6px #ff00ff; }
+        .legend-dot.outer-rim { background: #ff3366; box-shadow: 0 0 6px #ff3366; }
+        .legend-dot.hutt { background: #8b4513; box-shadow: 0 0 6px #8b4513; }
+        .legend-dot.wild { background: #666; box-shadow: 0 0 6px #666; }
+
+        /* Stats section */
+        .stats-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a3a4a;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.7rem;
+        }
+
+        .stat-label {
+            color: #4a7a8a;
+        }
+
+        .stat-value {
+            color: #00d4ff;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Planet info panel */
+        .info-panel {
+            flex: 1;
+            padding: 15px 20px;
+            overflow-y: auto;
+        }
+
+        .info-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: #0a0a12;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: #1a3a4a;
+            border-radius: 3px;
+        }
+
+        .info-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: #c41e3a;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .info-content {
+            font-size: 0.75rem;
+            line-height: 1.6;
+            color: #8ab4c4;
+        }
+
+        .info-content .planet-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #00d4ff;
+        }
+
+        .info-content .detail {
+            margin-bottom: 4px;
+        }
+
+        .info-content .detail-label {
+            color: #4a7a8a;
+        }
+
+        .info-content .description {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #1a3a4a;
+            font-size: 0.7rem;
+            color: #6a9aaa;
+        }
+
+        /* Map container */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #000;
+        }
+
+        /* Custom Leaflet styles */
+        .leaflet-container {
+            background: #000 !important;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .leaflet-control-zoom {
+            border: 2px solid #1a3a4a !important;
+            background: #0a0a12 !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: #0a0a12 !important;
+            color: #00d4ff !important;
+            border-color: #1a3a4a !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: #1a3a4a !important;
+        }
+
+        /* Planet labels */
+        .planet-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            color: #8ab4c4;
+            text-shadow: 0 0 3px #000, 1px 1px 2px #000;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .planet-label.major {
+            font-size: 11px;
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00d4ff, 0 0 10px #000;
+        }
+
+        /* Custom popup */
+        .leaflet-popup-content-wrapper {
+            background: rgba(10, 10, 18, 0.95) !important;
+            border: 2px solid #00d4ff !important;
+            border-radius: 0 !important;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
+        }
+
+        .leaflet-popup-content {
+            color: #00d4ff !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            margin: 10px !important;
+        }
+
+        .leaflet-popup-tip {
+            background: #00d4ff !important;
+        }
+
+        .popup-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px #00d4ff;
+        }
+
+        .popup-detail {
+            font-size: 11px;
+            color: #8ab4c4;
+            margin-bottom: 3px;
+        }
+
+        .popup-detail span {
+            color: #4a7a8a;
+        }
+
+        /* Scan lines overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            opacity: 0.3;
+        }
+
+        /* Corner decorations */
+        .corner-decor {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            z-index: 1001;
+            pointer-events: none;
+        }
+
+        .corner-decor.top-right {
+            top: 10px;
+            right: 10px;
+            border-top: 3px solid #00d4ff;
+            border-right: 3px solid #00d4ff;
+        }
+
+        .corner-decor.bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 3px solid #00d4ff;
+            border-right: 3px solid #00d4ff;
+        }
+
+        .corner-decor.bottom-left {
+            bottom: 10px;
+            left: 330px;
+            border-bottom: 3px solid #c41e3a;
+            border-left: 3px solid #c41e3a;
+        }
+
+        /* Grid coordinate display */
+        .grid-coords {
+            position: absolute;
+            bottom: 20px;
+            right: 70px;
+            background: rgba(10, 10, 18, 0.8);
+            border: 1px solid #1a3a4a;
+            padding: 8px 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: #00d4ff;
+            z-index: 1001;
+        }
+
+        /* Loading screen */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Hyperlane tooltip */
+        .hyperlane-tooltip {
+            background: rgba(10, 10, 18, 0.9) !important;
+            border: 1px solid #00d4ff !important;
+            border-radius: 0 !important;
+            color: #00d4ff !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            font-size: 11px !important;
+            padding: 5px 10px !important;
+        }
+
+        .leaflet-tooltip-left:before,
+        .leaflet-tooltip-right:before {
+            border-left-color: #00d4ff !important;
+            border-right-color: #00d4ff !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loading-text">Initializing Galactic Database...</div>
+    </div>
+
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <div class="side-panel">
+            <div class="title-section">
+                <div class="main-title">The Galaxy Far, Far Away...</div>
+                <div class="subtitle">Interactive Galactic Map // Expanded Universe</div>
+            </div>
+
+            <div class="legend-section">
+                <div class="legend-title">Hyperspace Routes</div>
+                <div class="legend-item">
+                    <div class="legend-line major"></div>
+                    <span>Major Trade Routes</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line minor"></div>
+                    <span>Minor Routes</span>
+                </div>
+            </div>
+
+            <div class="legend-section">
+                <div class="legend-title">Galactic Regions</div>
+                <div class="legend-item">
+                    <div class="legend-dot core"></div>
+                    <span>Core Worlds / Deep Core</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot colonies"></div>
+                    <span>Colonies</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot inner-rim"></div>
+                    <span>Inner Rim</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot expansion"></div>
+                    <span>Expansion Region</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot mid-rim"></div>
+                    <span>Mid Rim</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot outer-rim"></div>
+                    <span>Outer Rim Territories</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot hutt"></div>
+                    <span>Hutt Space</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot wild"></div>
+                    <span>Wild Space / Unknown</span>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="legend-title">Database Statistics</div>
+                <div class="stat-row">
+                    <span class="stat-label">Catalogued Systems:</span>
+                    <span class="stat-value" id="planet-count">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Mapped Hyperlanes:</span>
+                    <span class="stat-value" id="route-count">--</span>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-title">System Information</div>
+                <div class="info-content" id="system-info">
+                    <div style="color: #4a7a8a; font-style: italic;">
+                        Select a system to view detailed information...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="corner-decor top-right"></div>
+            <div class="corner-decor bottom-right"></div>
+            <div class="corner-decor bottom-left"></div>
+            <div class="grid-coords" id="coords">COORDS: --</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Region colors
+        const regionColors = {
+            'Core Worlds': '#ffd700',
+            'Deep Core': '#ffd700',
+            'Colonies': '#00ff88',
+            'Inner Rim': '#00d4ff',
+            'Expansion Region': '#ff6b00',
+            'Mid Rim': '#ff00ff',
+            'Outer Rim Territories': '#ff3366',
+            'Hutt Space': '#8b4513',
+            'Wild Space': '#666666',
+            'Unknown Regions': '#444444'
+        };
+
+        // Initialize map
+        const map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom: 1,
+            maxZoom: 8,
+            zoomControl: true,
+            attributionControl: false
+        });
+
+        // Set bounds based on data extent (approximate)
+        const bounds = [[-25, 0], [0, 25]];
+        map.fitBounds(bounds);
+        map.setView([-12, 14], 3);
+
+        // Create grid layer
+        function createGrid() {
+            const gridGroup = L.layerGroup();
+
+            // Vertical lines
+            for (let x = 0; x <= 30; x += 1) {
+                const line = L.polyline([[-30, x], [5, x]], {
+                    color: '#1a3a4a',
+                    weight: x % 5 === 0 ? 1 : 0.5,
+                    opacity: x % 5 === 0 ? 0.4 : 0.2
+                });
+                gridGroup.addLayer(line);
+            }
+
+            // Horizontal lines
+            for (let y = -30; y <= 5; y += 1) {
+                const line = L.polyline([[y, 0], [y, 30]], {
+                    color: '#1a3a4a',
+                    weight: y % 5 === 0 ? 1 : 0.5,
+                    opacity: y % 5 === 0 ? 0.4 : 0.2
+                });
+                gridGroup.addLayer(line);
+            }
+
+            return gridGroup;
+        }
+
+        // Create galaxy background gradient (spiral effect)
+        function createGalaxyBackground() {
+            const center = [-12, 14];
+            const circles = L.layerGroup();
+
+            for (let r = 1; r <= 15; r += 0.5) {
+                const circle = L.circle(center, {
+                    radius: r,
+                    color: 'transparent',
+                    fillColor: r < 3 ? '#3a3a2a' : (r < 6 ? '#2a2a1a' : '#1a1a0a'),
+                    fillOpacity: 0.1 / r,
+                    weight: 0
+                });
+                circles.addLayer(circle);
+            }
+
+            return circles;
+        }
+
+        // Style hyperlanes
+        function getHyperlaneStyle(feature) {
+            const isMajor = feature.properties.size === 'Major';
+            return {
+                color: isMajor ? '#00d4ff' : '#4a7a8a',
+                weight: isMajor ? 3 : 1.5,
+                opacity: isMajor ? 0.9 : 0.6,
+                lineCap: 'round',
+                lineJoin: 'round'
+            };
+        }
+
+        // Create glow effect for hyperlanes
+        function createGlowLine(feature, latlngs) {
+            const isMajor = feature.properties.size === 'Major';
+            if (!isMajor) return null;
+
+            return L.polyline(latlngs, {
+                color: '#00d4ff',
+                weight: 8,
+                opacity: 0.15,
+                lineCap: 'round',
+                lineJoin: 'round'
+            });
+        }
+
+        // Get planet marker options
+        function getPlanetMarkerOptions(feature) {
+            const region = feature.properties.region || 'Unknown';
+            const intensity = feature.properties.intensity || 1;
+            const color = regionColors[region] || '#666666';
+
+            const baseRadius = 2;
+            const radius = baseRadius + (intensity * 1.5);
+
+            return {
+                radius: radius,
+                fillColor: color,
+                color: color,
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            };
+        }
+
+        // Create planet label
+        function createPlanetLabel(feature, latlng) {
+            const intensity = feature.properties.intensity || 1;
+            if (intensity < 3) return null; // Only show labels for major planets at default zoom
+
+            const labelClass = intensity >= 4 ? 'planet-label major' : 'planet-label';
+
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    className: labelClass,
+                    html: feature.properties.name,
+                    iconSize: null,
+                    iconAnchor: [-8, 4]
+                }),
+                interactive: false
+            });
+        }
+
+        // Update system info panel
+        function updateSystemInfo(properties) {
+            const infoDiv = document.getElementById('system-info');
+
+            let html = `<div class="planet-name">${properties.name || 'Unknown System'}</div>`;
+
+            if (properties.region) {
+                html += `<div class="detail"><span class="detail-label">Region:</span> ${properties.region}</div>`;
+            }
+            if (properties.sector) {
+                html += `<div class="detail"><span class="detail-label">Sector:</span> ${properties.sector}</div>`;
+            }
+            if (properties.coordinates) {
+                html += `<div class="detail"><span class="detail-label">Grid:</span> ${properties.coordinates}</div>`;
+            }
+            if (properties.climate) {
+                html += `<div class="detail"><span class="detail-label">Climate:</span> ${properties.climate}</div>`;
+            }
+            if (properties.terrain) {
+                html += `<div class="detail"><span class="detail-label">Terrain:</span> ${properties.terrain}</div>`;
+            }
+            if (properties.traderoutes) {
+                html += `<div class="detail"><span class="detail-label">Trade Routes:</span> ${properties.traderoutes}</div>`;
+            }
+            if (properties.poi) {
+                html += `<div class="detail"><span class="detail-label">Notable:</span> ${properties.poi}</div>`;
+            }
+            if (properties.description) {
+                const shortDesc = properties.description.length > 300
+                    ? properties.description.substring(0, 300) + '...'
+                    : properties.description;
+                html += `<div class="description">${shortDesc}</div>`;
+            }
+
+            infoDiv.innerHTML = html;
+        }
+
+        // Load data and create layers
+        let planetsData, hyperlanesData;
+        let planetMarkers = [];
+        let planetLabels = [];
+
+        Promise.all([
+            fetch('data/planets.geojson').then(r => r.json()),
+            fetch('data/hyperlanes.geojson').then(r => r.json())
+        ]).then(([planets, hyperlanes]) => {
+            planetsData = planets;
+            hyperlanesData = hyperlanes;
+
+            // Update stats
+            document.getElementById('planet-count').textContent = planets.features.length.toLocaleString();
+            document.getElementById('route-count').textContent = hyperlanes.features.length;
+
+            // Add background layers
+            createGalaxyBackground().addTo(map);
+            createGrid().addTo(map);
+
+            // Add hyperlane glow layer first
+            const glowGroup = L.layerGroup();
+            hyperlanes.features.forEach(feature => {
+                if (feature.geometry.type === 'MultiLineString') {
+                    feature.geometry.coordinates.forEach(line => {
+                        const latlngs = line.map(coord => [coord[1], coord[0]]);
+                        const glow = createGlowLine(feature, latlngs);
+                        if (glow) glowGroup.addLayer(glow);
+                    });
+                }
+            });
+            glowGroup.addTo(map);
+
+            // Add hyperlanes
+            L.geoJSON(hyperlanes, {
+                style: getHyperlaneStyle,
+                coordsToLatLng: function(coords) {
+                    return L.latLng(coords[1], coords[0]);
+                },
+                onEachFeature: function(feature, layer) {
+                    if (feature.properties.name) {
+                        layer.bindTooltip(feature.properties.name, {
+                            className: 'hyperlane-tooltip',
+                            sticky: true
+                        });
+                    }
+                }
+            }).addTo(map);
+
+            // Add planets
+            const planetsLayer = L.geoJSON(planets, {
+                pointToLayer: function(feature, latlng) {
+                    const marker = L.circleMarker(latlng, getPlanetMarkerOptions(feature));
+                    planetMarkers.push({ marker, feature, latlng });
+
+                    // Create label
+                    const label = createPlanetLabel(feature, latlng);
+                    if (label) planetLabels.push({ label, feature });
+
+                    return marker;
+                },
+                coordsToLatLng: function(coords) {
+                    return L.latLng(coords[1], coords[0]);
+                },
+                onEachFeature: function(feature, layer) {
+                    // Click handler
+                    layer.on('click', function() {
+                        updateSystemInfo(feature.properties);
+                    });
+
+                    // Hover effect
+                    layer.on('mouseover', function() {
+                        this.setStyle({
+                            weight: 3,
+                            fillOpacity: 1
+                        });
+                        this.bringToFront();
+                    });
+
+                    layer.on('mouseout', function() {
+                        const opts = getPlanetMarkerOptions(feature);
+                        this.setStyle({
+                            weight: opts.weight,
+                            fillOpacity: opts.fillOpacity
+                        });
+                    });
+
+                    // Tooltip
+                    const region = feature.properties.region || 'Unknown';
+                    layer.bindTooltip(`
+                        <div class="popup-title">${feature.properties.name}</div>
+                        <div class="popup-detail"><span>Region:</span> ${region}</div>
+                        ${feature.properties.sector ? `<div class="popup-detail"><span>Sector:</span> ${feature.properties.sector}</div>` : ''}
+                    `, {
+                        className: 'hyperlane-tooltip',
+                        direction: 'top',
+                        offset: [0, -5]
+                    });
+                }
+            }).addTo(map);
+
+            // Labels layer
+            const labelsLayer = L.layerGroup();
+            planetLabels.forEach(item => {
+                labelsLayer.addLayer(item.label);
+            });
+            labelsLayer.addTo(map);
+
+            // Dynamic label visibility based on zoom
+            map.on('zoomend', function() {
+                const zoom = map.getZoom();
+
+                labelsLayer.clearLayers();
+
+                planetLabels.forEach(item => {
+                    const intensity = item.feature.properties.intensity || 1;
+                    let showLabel = false;
+
+                    if (zoom >= 6) showLabel = intensity >= 1;
+                    else if (zoom >= 5) showLabel = intensity >= 2;
+                    else if (zoom >= 4) showLabel = intensity >= 3;
+                    else if (zoom >= 3) showLabel = intensity >= 4;
+                    else showLabel = intensity >= 5;
+
+                    if (showLabel) {
+                        labelsLayer.addLayer(item.label);
+                    }
+                });
+            });
+
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
+        });
+
+        // Update coordinates display on mouse move
+        map.on('mousemove', function(e) {
+            const lat = e.latlng.lat.toFixed(2);
+            const lng = e.latlng.lng.toFixed(2);
+            document.getElementById('coords').textContent = `COORDS: ${lng}, ${lat}`;
+        });
+    </script>
+</body>
+</html>
