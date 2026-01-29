@@ -1,5 +1,5 @@
 # The-Star-Wars-Galaxy
-
+ 
 Hello Everyone!
 
 This was a pet project of mine to prep a map for the Esri UC Map Gallery. I thought it would be nice to show off something that wasn't work related for once.
@@ -20,6 +20,7 @@ https://github.com/dennisbakhuis/wookieepediascience
 Long story short, I'm putting the shapefile I've compiled for this project up here for the whole fandom to use and edit to their own content. And yes, this map only includes
 worlds from the pre-Disney Expanded Universe. Sorry, Mickey. You can't replace the stories I grew up with.
 
+View the web map! https://the-star-wars-galaxy.vercel.app/
 
 
 <img src="https://github.com/geoJaSON/The-Star-Wars-Galaxy/blob/main/the_galaxy_far_far_away.jpg?raw=true?raw=true" alt="The Galaxy Far, Far Away">
