@@ -22,7 +22,6 @@
             height: 100vh;
         }
 
-        /* Main container */
         .container {
             display: flex;
             height: 100vh;
@@ -38,6 +37,7 @@
             flex-direction: column;
             position: relative;
             z-index: 1000;
+            overflow: hidden;
         }
 
         .side-panel::before {
@@ -51,16 +51,15 @@
             opacity: 0.3;
         }
 
-        /* Title section */
         .title-section {
-            padding: 20px;
+            padding: 15px 20px;
             border-bottom: 2px solid #c41e3a;
             background: linear-gradient(180deg, #1a0a0a 0%, #0a0a12 100%);
         }
 
         .main-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 900;
             color: #c41e3a;
             text-transform: uppercase;
@@ -70,132 +69,211 @@
         }
 
         .subtitle {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #666;
             letter-spacing: 1px;
         }
 
-        /* Legend section */
-        .legend-section {
-            padding: 15px 20px;
+        /* Search section */
+        .search-section {
+            padding: 12px 20px;
+            border-bottom: 1px solid #1a3a4a;
+            background: rgba(0, 20, 30, 0.5);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0a0a12;
+            border: 2px solid #1a3a4a;
+            color: #00d4ff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #4a7a8a;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0a0a12;
+            border: 2px solid #00d4ff;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #1a3a4a;
+            font-size: 0.75rem;
+        }
+
+        .search-result-item:hover {
+            background: #1a3a4a;
+        }
+
+        .search-result-item .name {
+            color: #00d4ff;
+        }
+
+        .search-result-item .region {
+            color: #4a7a8a;
+            font-size: 0.65rem;
+        }
+
+        /* Quick jump section */
+        .quickjump-section {
+            padding: 12px 20px;
             border-bottom: 1px solid #1a3a4a;
         }
 
-        .legend-title {
+        .section-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #00d4ff;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .legend-item {
+        .quickjump-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .quickjump-btn {
+            padding: 6px 4px;
+            background: #0a0a12;
+            border: 1px solid #1a3a4a;
+            color: #8ab4c4;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .quickjump-btn:hover {
+            background: #1a3a4a;
+            border-color: #00d4ff;
+            color: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Region filters */
+        .filter-section {
+            padding: 12px 20px;
+            border-bottom: 1px solid #1a3a4a;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        .filter-btn {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.75rem;
+            padding: 5px 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #6a8a9a;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .legend-line {
-            width: 30px;
-            height: 3px;
-            margin-right: 10px;
-            border-radius: 2px;
+        .filter-btn.active {
+            color: #00d4ff;
         }
 
-        .legend-line.major {
-            background: #00d4ff;
-            box-shadow: 0 0 8px #00d4ff;
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
         }
 
-        .legend-line.minor {
-            background: #4a7a8a;
-            height: 2px;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
+        .filter-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 6px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
 
-        .legend-dot.core { background: #ffd700; box-shadow: 0 0 6px #ffd700; }
-        .legend-dot.colonies { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
-        .legend-dot.inner-rim { background: #00d4ff; box-shadow: 0 0 6px #00d4ff; }
-        .legend-dot.expansion { background: #ff6b00; box-shadow: 0 0 6px #ff6b00; }
-        .legend-dot.mid-rim { background: #ff00ff; box-shadow: 0 0 6px #ff00ff; }
-        .legend-dot.outer-rim { background: #ff3366; box-shadow: 0 0 6px #ff3366; }
-        .legend-dot.hutt { background: #8b4513; box-shadow: 0 0 6px #8b4513; }
-        .legend-dot.wild { background: #666; box-shadow: 0 0 6px #666; }
+        .filter-btn.active .filter-dot {
+            opacity: 1;
+            box-shadow: 0 0 6px currentColor;
+        }
 
         /* Stats section */
         .stats-section {
-            padding: 15px 20px;
+            padding: 10px 20px;
             border-bottom: 1px solid #1a3a4a;
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.7rem;
+            margin-bottom: 3px;
+            font-size: 0.65rem;
         }
 
-        .stat-label {
-            color: #4a7a8a;
-        }
+        .stat-label { color: #4a7a8a; }
+        .stat-value { color: #00d4ff; font-family: 'Orbitron', sans-serif; }
 
-        .stat-value {
-            color: #00d4ff;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Planet info panel */
+        /* Info panel */
         .info-panel {
             flex: 1;
-            padding: 15px 20px;
+            padding: 12px 20px;
             overflow-y: auto;
         }
 
-        .info-panel::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .info-panel::-webkit-scrollbar-track {
-            background: #0a0a12;
-        }
-
-        .info-panel::-webkit-scrollbar-thumb {
-            background: #1a3a4a;
-            border-radius: 3px;
-        }
-
-        .info-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            color: #c41e3a;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
+        .info-panel::-webkit-scrollbar { width: 6px; }
+        .info-panel::-webkit-scrollbar-track { background: #0a0a12; }
+        .info-panel::-webkit-scrollbar-thumb { background: #1a3a4a; border-radius: 3px; }
 
         .info-content {
-            font-size: 0.75rem;
-            line-height: 1.6;
+            font-size: 0.7rem;
+            line-height: 1.5;
             color: #8ab4c4;
         }
 
         .info-content .planet-name {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #00d4ff;
             margin-bottom: 8px;
             text-shadow: 0 0 10px #00d4ff;
         }
 
         .info-content .detail {
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .info-content .detail-label {
@@ -206,7 +284,7 @@
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #1a3a4a;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #6a9aaa;
         }
 
@@ -222,7 +300,23 @@
             background: #000;
         }
 
-        /* Custom Leaflet styles */
+        /* CSS Grid overlay - much more performant than SVG lines */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 400;
+            background-image:
+                linear-gradient(rgba(26, 58, 74, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 58, 74, 0.3) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+        }
+
+        /* Leaflet overrides */
         .leaflet-container {
             background: #000 !important;
             font-family: 'Share Tech Mono', monospace;
@@ -248,7 +342,7 @@
             font-family: 'Share Tech Mono', monospace;
             font-size: 9px;
             color: #8ab4c4;
-            text-shadow: 0 0 3px #000, 1px 1px 2px #000;
+            text-shadow: 0 0 3px #000, 1px 1px 2px #000, -1px -1px 2px #000;
             white-space: nowrap;
             pointer-events: none;
         }
@@ -260,43 +354,38 @@
             text-shadow: 0 0 5px #00d4ff, 0 0 10px #000;
         }
 
-        /* Custom popup */
-        .leaflet-popup-content-wrapper {
+        /* Tooltips */
+        .leaflet-tooltip.custom-tooltip {
             background: rgba(10, 10, 18, 0.95) !important;
-            border: 2px solid #00d4ff !important;
+            border: 1px solid #00d4ff !important;
             border-radius: 0 !important;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3) !important;
-        }
-
-        .leaflet-popup-content {
             color: #00d4ff !important;
             font-family: 'Share Tech Mono', monospace !important;
-            margin: 10px !important;
+            font-size: 11px !important;
+            padding: 6px 10px !important;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
         }
 
-        .leaflet-popup-tip {
-            background: #00d4ff !important;
+        .leaflet-tooltip.custom-tooltip::before {
+            border-top-color: #00d4ff !important;
         }
 
         .popup-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            color: #00d4ff;
-            margin-bottom: 8px;
-            text-shadow: 0 0 5px #00d4ff;
+            font-size: 12px;
+            margin-bottom: 4px;
         }
 
         .popup-detail {
-            font-size: 11px;
+            font-size: 10px;
             color: #8ab4c4;
-            margin-bottom: 3px;
         }
 
         .popup-detail span {
             color: #4a7a8a;
         }
 
-        /* Scan lines overlay */
+        /* Scan lines */
         .scanlines {
             position: fixed;
             top: 0;
@@ -312,14 +401,14 @@
                 transparent 1px,
                 transparent 2px
             );
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
         /* Corner decorations */
         .corner-decor {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             z-index: 1001;
             pointer-events: none;
         }
@@ -340,21 +429,21 @@
 
         .corner-decor.bottom-left {
             bottom: 10px;
-            left: 330px;
+            left: 10px;
             border-bottom: 3px solid #c41e3a;
             border-left: 3px solid #c41e3a;
         }
 
-        /* Grid coordinate display */
+        /* Coordinates display */
         .grid-coords {
             position: absolute;
-            bottom: 20px;
-            right: 70px;
-            background: rgba(10, 10, 18, 0.8);
+            bottom: 15px;
+            right: 60px;
+            background: rgba(10, 10, 18, 0.85);
             border: 1px solid #1a3a4a;
-            padding: 8px 12px;
+            padding: 6px 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #00d4ff;
             z-index: 1001;
         }
@@ -382,11 +471,27 @@
 
         .loading-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #00d4ff;
             text-transform: uppercase;
             letter-spacing: 3px;
             animation: pulse 1.5s infinite;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 3px;
+            background: #1a3a4a;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            background: #00d4ff;
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px #00d4ff;
         }
 
         @keyframes pulse {
@@ -394,27 +499,192 @@
             50% { opacity: 1; }
         }
 
-        /* Hyperlane tooltip */
-        .hyperlane-tooltip {
-            background: rgba(10, 10, 18, 0.9) !important;
-            border: 1px solid #00d4ff !important;
-            border-radius: 0 !important;
-            color: #00d4ff !important;
-            font-family: 'Share Tech Mono', monospace !important;
-            font-size: 11px !important;
-            padding: 5px 10px !important;
+        /* Animated hyperlane styles */
+        .hyperlane-animated {
+            stroke-dasharray: 8 4;
+            animation: flowDash 1s linear infinite;
         }
 
-        .leaflet-tooltip-left:before,
-        .leaflet-tooltip-right:before {
-            border-left-color: #00d4ff !important;
-            border-right-color: #00d4ff !important;
+        @keyframes flowDash {
+            to { stroke-dashoffset: -12; }
+        }
+
+        /* Targeting crosshair animation */
+        .targeting-reticle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 2000;
+            transform: translate(-50%, -50%);
+        }
+
+        .reticle-ring {
+            position: absolute;
+            border: 2px solid #c41e3a;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            box-shadow: 0 0 10px #c41e3a, inset 0 0 10px rgba(196, 30, 58, 0.3);
+        }
+
+        .reticle-ring.outer {
+            width: 120px;
+            height: 120px;
+            animation: reticleOuter 0.8s ease-out forwards;
+        }
+
+        .reticle-ring.middle {
+            width: 80px;
+            height: 80px;
+            animation: reticleMiddle 0.8s ease-out 0.1s forwards;
+        }
+
+        .reticle-ring.inner {
+            width: 40px;
+            height: 40px;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px #00d4ff, inset 0 0 10px rgba(0, 212, 255, 0.3);
+            animation: reticleInner 0.8s ease-out 0.2s forwards;
+        }
+
+        .reticle-crosshair {
+            position: absolute;
+            background: #00d4ff;
+            box-shadow: 0 0 8px #00d4ff;
+            opacity: 0;
+        }
+
+        .reticle-crosshair.horizontal {
+            width: 150px;
+            height: 2px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scaleX(0);
+            animation: crosshairH 0.5s ease-out 0.3s forwards;
+        }
+
+        .reticle-crosshair.vertical {
+            width: 2px;
+            height: 150px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scaleY(0);
+            animation: crosshairV 0.5s ease-out 0.3s forwards;
+        }
+
+        .reticle-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: #c41e3a;
+            border-style: solid;
+            border-width: 0;
+            opacity: 0;
+            box-shadow: 0 0 5px #c41e3a;
+        }
+
+        .reticle-corner.tl { top: -40px; left: -40px; border-top-width: 3px; border-left-width: 3px; animation: cornerIn 0.4s ease-out 0.4s forwards, cornerPulse 1s ease-in-out 0.8s infinite; }
+        .reticle-corner.tr { top: -40px; right: -40px; border-top-width: 3px; border-right-width: 3px; animation: cornerIn 0.4s ease-out 0.45s forwards, cornerPulse 1s ease-in-out 0.85s infinite; }
+        .reticle-corner.bl { bottom: -40px; left: -40px; border-bottom-width: 3px; border-left-width: 3px; animation: cornerIn 0.4s ease-out 0.5s forwards, cornerPulse 1s ease-in-out 0.9s infinite; }
+        .reticle-corner.br { bottom: -40px; right: -40px; border-bottom-width: 3px; border-right-width: 3px; animation: cornerIn 0.4s ease-out 0.55s forwards, cornerPulse 1s ease-in-out 0.95s infinite; }
+
+        .reticle-text {
+            position: absolute;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            opacity: 0;
+            text-shadow: 0 0 10px #00d4ff;
+            animation: textIn 0.3s ease-out 0.5s forwards;
+        }
+
+        .reticle-coords {
+            position: absolute;
+            bottom: -65px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: #c41e3a;
+            white-space: nowrap;
+            opacity: 0;
+            animation: textIn 0.3s ease-out 0.6s forwards;
+        }
+
+        @keyframes reticleOuter {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes reticleMiddle {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes reticleInner {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes crosshairH {
+            0% { opacity: 0; transform: translate(-50%, -50%) scaleX(0); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scaleX(1); }
+        }
+
+        @keyframes crosshairV {
+            0% { opacity: 0; transform: translate(-50%, -50%) scaleY(0); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scaleY(1); }
+        }
+
+        @keyframes cornerIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes cornerPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes textIn {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Lock confirmation flash */
+        .reticle-flash {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            animation: lockFlash 0.6s ease-out 0.7s forwards;
+        }
+
+        @keyframes lockFlash {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
         <div class="loading-text">Initializing Galactic Database...</div>
+        <div class="loading-bar"><div class="loading-bar-fill" id="loading-bar"></div></div>
     </div>
 
     <div class="scanlines"></div>
@@ -426,71 +696,43 @@
                 <div class="subtitle">Interactive Galactic Map // Expanded Universe</div>
             </div>
 
-            <div class="legend-section">
-                <div class="legend-title">Hyperspace Routes</div>
-                <div class="legend-item">
-                    <div class="legend-line major"></div>
-                    <span>Major Trade Routes</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line minor"></div>
-                    <span>Minor Routes</span>
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input" placeholder="Search systems..." autocomplete="off">
+                    <div class="search-results" id="search-results"></div>
                 </div>
             </div>
 
-            <div class="legend-section">
-                <div class="legend-title">Galactic Regions</div>
-                <div class="legend-item">
-                    <div class="legend-dot core"></div>
-                    <span>Core Worlds / Deep Core</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot colonies"></div>
-                    <span>Colonies</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot inner-rim"></div>
-                    <span>Inner Rim</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot expansion"></div>
-                    <span>Expansion Region</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot mid-rim"></div>
-                    <span>Mid Rim</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot outer-rim"></div>
-                    <span>Outer Rim Territories</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot hutt"></div>
-                    <span>Hutt Space</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-dot wild"></div>
-                    <span>Wild Space / Unknown</span>
-                </div>
+            <div class="quickjump-section">
+                <div class="section-title">Quick Jump</div>
+                <div class="quickjump-grid" id="quickjump-grid"></div>
+            </div>
+
+            <div class="filter-section">
+                <div class="section-title">Region Filters</div>
+                <div class="filter-grid" id="filter-grid"></div>
             </div>
 
             <div class="stats-section">
-                <div class="legend-title">Database Statistics</div>
                 <div class="stat-row">
-                    <span class="stat-label">Catalogued Systems:</span>
+                    <span class="stat-label">Visible Systems:</span>
+                    <span class="stat-value" id="visible-count">--</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Catalogued:</span>
                     <span class="stat-value" id="planet-count">--</span>
                 </div>
                 <div class="stat-row">
-                    <span class="stat-label">Mapped Hyperlanes:</span>
+                    <span class="stat-label">Hyperlanes:</span>
                     <span class="stat-value" id="route-count">--</span>
                 </div>
             </div>
 
             <div class="info-panel">
-                <div class="info-title">System Information</div>
+                <div class="section-title">System Information</div>
                 <div class="info-content" id="system-info">
                     <div style="color: #4a7a8a; font-style: italic;">
-                        Select a system to view detailed information...
+                        Select a system to view details...
                     </div>
                 </div>
             </div>
@@ -498,6 +740,7 @@
 
         <div class="map-container">
             <div id="map"></div>
+            <div class="grid-overlay"></div>
             <div class="corner-decor top-right"></div>
             <div class="corner-decor bottom-right"></div>
             <div class="corner-decor bottom-left"></div>
@@ -507,322 +750,587 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Region colors
-        const regionColors = {
-            'Core Worlds': '#ffd700',
-            'Deep Core': '#ffd700',
-            'Colonies': '#00ff88',
-            'Inner Rim': '#00d4ff',
-            'Expansion Region': '#ff6b00',
-            'Mid Rim': '#ff00ff',
-            'Outer Rim Territories': '#ff3366',
-            'Hutt Space': '#8b4513',
-            'Wild Space': '#666666',
-            'Unknown Regions': '#444444'
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const CONFIG = {
+            regions: {
+                'Core Worlds': { color: '#ffd700', order: 1 },
+                'Deep Core': { color: '#ffd700', order: 0 },
+                'Colonies': { color: '#00ff88', order: 2 },
+                'Inner Rim': { color: '#00d4ff', order: 3 },
+                'Expansion Region': { color: '#ff6b00', order: 4 },
+                'Mid Rim': { color: '#ff00ff', order: 5 },
+                'Outer Rim Territories': { color: '#ff3366', order: 6 },
+                'Hutt Space': { color: '#8b4513', order: 7 },
+                'Wild Space': { color: '#666666', order: 8 },
+                'Unknown Regions': { color: '#444444', order: 9 }
+            },
+            famousPlanets: [
+                'Coruscant', 'Tatooine', 'Hoth', 'Endor', 'Naboo', 'Mustafar',
+                'Kashyyyk', 'Dagobah', 'Bespin', 'Alderaan', 'Kamino', 'Geonosis'
+            ],
+            labelZoomThresholds: {
+                5: 2,  // Only major planets (intensity 5) at low zoom
+                4: 5,  // Important planets need zoom 5+
+                3: 6,  // Medium planets need zoom 6+
+                2: 7,  // Minor planets need zoom 7+
+                1: 8   // Tiny planets only at max zoom
+            }
         };
 
-        // Initialize map
+        // ============================================
+        // STATE
+        // ============================================
+        let planetsData = [];
+        let hyperlanesData = [];
+        let activeFilters = new Set(Object.keys(CONFIG.regions));
+        let visibleMarkers = new Map();
+        let labelsLayer = null;
+        let markersLayer = null;
+        let hyperlanesLayer = null;
+        let hyperlaneGlowLayer = null;
+
+        // ============================================
+        // MAP INITIALIZATION (with Canvas renderer!)
+        // ============================================
         const map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: 1,
             maxZoom: 8,
             zoomControl: true,
-            attributionControl: false
+            attributionControl: false,
+            renderer: L.canvas({ padding: 0.5 }), // CANVAS RENDERER - huge performance boost
+            preferCanvas: true
         });
 
-        // Set bounds based on data extent (approximate)
-        const bounds = [[-25, 0], [0, 25]];
-        map.fitBounds(bounds);
         map.setView([-12, 14], 3);
 
-        // Create grid layer
-        function createGrid() {
-            const gridGroup = L.layerGroup();
-
-            // Vertical lines
-            for (let x = 0; x <= 30; x += 1) {
-                const line = L.polyline([[-30, x], [5, x]], {
-                    color: '#1a3a4a',
-                    weight: x % 5 === 0 ? 1 : 0.5,
-                    opacity: x % 5 === 0 ? 0.4 : 0.2
-                });
-                gridGroup.addLayer(line);
-            }
-
-            // Horizontal lines
-            for (let y = -30; y <= 5; y += 1) {
-                const line = L.polyline([[y, 0], [y, 30]], {
-                    color: '#1a3a4a',
-                    weight: y % 5 === 0 ? 1 : 0.5,
-                    opacity: y % 5 === 0 ? 0.4 : 0.2
-                });
-                gridGroup.addLayer(line);
-            }
-
-            return gridGroup;
-        }
-
-        // Create galaxy background gradient (spiral effect)
-        function createGalaxyBackground() {
-            const center = [-12, 14];
-            const circles = L.layerGroup();
-
-            for (let r = 1; r <= 15; r += 0.5) {
-                const circle = L.circle(center, {
-                    radius: r,
-                    color: 'transparent',
-                    fillColor: r < 3 ? '#3a3a2a' : (r < 6 ? '#2a2a1a' : '#1a1a0a'),
-                    fillOpacity: 0.1 / r,
-                    weight: 0
-                });
-                circles.addLayer(circle);
-            }
-
-            return circles;
-        }
-
-        // Style hyperlanes
-        function getHyperlaneStyle(feature) {
-            const isMajor = feature.properties.size === 'Major';
-            return {
-                color: isMajor ? '#00d4ff' : '#4a7a8a',
-                weight: isMajor ? 3 : 1.5,
-                opacity: isMajor ? 0.9 : 0.6,
-                lineCap: 'round',
-                lineJoin: 'round'
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
 
-        // Create glow effect for hyperlanes
-        function createGlowLine(feature, latlngs) {
-            const isMajor = feature.properties.size === 'Major';
-            if (!isMajor) return null;
+        function getRegionColor(region) {
+            return CONFIG.regions[region]?.color || '#666666';
+        }
 
-            return L.polyline(latlngs, {
-                color: '#00d4ff',
-                weight: 8,
-                opacity: 0.15,
-                lineCap: 'round',
-                lineJoin: 'round'
+        function updateLoadingBar(percent) {
+            document.getElementById('loading-bar').style.width = percent + '%';
+        }
+
+        // ============================================
+        // TARGETING RETICLE ANIMATION
+        // ============================================
+        let activeReticle = null;
+
+        function showTargetingReticle(latlng, planetName, gridCoords) {
+            // Remove any existing reticle
+            if (activeReticle) {
+                activeReticle.remove();
+            }
+
+            // Get screen position from map coordinates
+            const point = map.latLngToContainerPoint(latlng);
+
+            // Create reticle container
+            const reticle = document.createElement('div');
+            reticle.className = 'targeting-reticle';
+            reticle.style.left = point.x + 'px';
+            reticle.style.top = point.y + 'px';
+
+            reticle.innerHTML = `
+                <div class="reticle-flash"></div>
+                <div class="reticle-ring outer"></div>
+                <div class="reticle-ring middle"></div>
+                <div class="reticle-ring inner"></div>
+                <div class="reticle-crosshair horizontal"></div>
+                <div class="reticle-crosshair vertical"></div>
+                <div class="reticle-corner tl"></div>
+                <div class="reticle-corner tr"></div>
+                <div class="reticle-corner bl"></div>
+                <div class="reticle-corner br"></div>
+                <div class="reticle-text">Target Acquired</div>
+                <div class="reticle-coords">${planetName}${gridCoords ? ' // ' + gridCoords : ''}</div>
+            `;
+
+            document.querySelector('.map-container').appendChild(reticle);
+            activeReticle = reticle;
+
+            // Play a subtle "lock" sound effect feel by flashing the whole thing
+            setTimeout(() => {
+                reticle.style.filter = 'brightness(1.5)';
+                setTimeout(() => {
+                    reticle.style.filter = '';
+                }, 100);
+            }, 700);
+
+            // Remove after animation completes
+            setTimeout(() => {
+                if (reticle.parentNode) {
+                    reticle.style.opacity = '0';
+                    reticle.style.transition = 'opacity 0.5s';
+                    setTimeout(() => reticle.remove(), 500);
+                }
+                if (activeReticle === reticle) {
+                    activeReticle = null;
+                }
+            }, 2500);
+        }
+
+        // ============================================
+        // SEARCH FUNCTIONALITY
+        // ============================================
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', debounce(function(e) {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (query.length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            const matches = planetsData
+                .filter(p => p.properties.name.toLowerCase().includes(query))
+                .slice(0, 15)
+                .sort((a, b) => {
+                    const aStarts = a.properties.name.toLowerCase().startsWith(query);
+                    const bStarts = b.properties.name.toLowerCase().startsWith(query);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return (b.properties.intensity || 1) - (a.properties.intensity || 1);
+                });
+
+            if (matches.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item"><span class="name">No systems found</span></div>';
+            } else {
+                searchResults.innerHTML = matches.map(p => `
+                    <div class="search-result-item" data-coords="${p.geometry.coordinates.join(',')}">
+                        <div class="name">${p.properties.name}</div>
+                        <div class="region">${p.properties.region || 'Unknown Region'}</div>
+                    </div>
+                `).join('');
+            }
+
+            searchResults.classList.add('active');
+        }, 150));
+
+        searchResults.addEventListener('click', function(e) {
+            const item = e.target.closest('.search-result-item');
+            if (item && item.dataset.coords) {
+                const [lng, lat] = item.dataset.coords.split(',').map(Number);
+                const latlng = L.latLng(lat, lng);
+
+                map.setView(latlng, 6);
+                searchResults.classList.remove('active');
+                searchInput.value = '';
+
+                // Find and show info for clicked planet
+                const planet = planetsData.find(p =>
+                    p.geometry.coordinates[0] === lng && p.geometry.coordinates[1] === lat
+                );
+
+                if (planet) {
+                    updateSystemInfo(planet.properties);
+
+                    // Show targeting reticle after map has moved
+                    setTimeout(() => {
+                        showTargetingReticle(
+                            latlng,
+                            planet.properties.name,
+                            planet.properties.coordinates
+                        );
+                    }, 300);
+                }
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // QUICK JUMP BUTTONS
+        // ============================================
+        function setupQuickJumps() {
+            const grid = document.getElementById('quickjump-grid');
+
+            CONFIG.famousPlanets.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'quickjump-btn';
+                btn.textContent = name;
+                btn.addEventListener('click', () => jumpToPlanet(name));
+                grid.appendChild(btn);
             });
         }
 
-        // Get planet marker options
-        function getPlanetMarkerOptions(feature) {
-            const region = feature.properties.region || 'Unknown';
-            const intensity = feature.properties.intensity || 1;
-            const color = regionColors[region] || '#666666';
+        function jumpToPlanet(name) {
+            const planet = planetsData.find(p =>
+                p.properties.name.toLowerCase() === name.toLowerCase()
+            );
 
-            const baseRadius = 2;
-            const radius = baseRadius + (intensity * 1.5);
+            if (planet) {
+                const [lng, lat] = planet.geometry.coordinates;
+                const latlng = L.latLng(lat, lng);
 
-            return {
-                radius: radius,
-                fillColor: color,
-                color: color,
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.8
-            };
+                map.setView(latlng, 6);
+                updateSystemInfo(planet.properties);
+
+                // Show targeting reticle after map has moved
+                setTimeout(() => {
+                    showTargetingReticle(
+                        latlng,
+                        planet.properties.name,
+                        planet.properties.coordinates
+                    );
+                }, 300);
+            }
         }
 
-        // Create planet label
-        function createPlanetLabel(feature, latlng) {
-            const intensity = feature.properties.intensity || 1;
-            if (intensity < 3) return null; // Only show labels for major planets at default zoom
+        // ============================================
+        // REGION FILTERS
+        // ============================================
+        function setupFilters() {
+            const grid = document.getElementById('filter-grid');
 
-            const labelClass = intensity >= 4 ? 'planet-label major' : 'planet-label';
-
-            return L.marker(latlng, {
-                icon: L.divIcon({
-                    className: labelClass,
-                    html: feature.properties.name,
-                    iconSize: null,
-                    iconAnchor: [-8, 4]
-                }),
-                interactive: false
-            });
+            Object.entries(CONFIG.regions)
+                .sort((a, b) => a[1].order - b[1].order)
+                .forEach(([region, config]) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-btn active';
+                    btn.dataset.region = region;
+                    btn.innerHTML = `
+                        <span class="filter-dot" style="background: ${config.color}; box-shadow: 0 0 6px ${config.color};"></span>
+                        ${region.replace(' Territories', '').replace(' Region', '')}
+                    `;
+                    btn.addEventListener('click', () => toggleFilter(region, btn));
+                    grid.appendChild(btn);
+                });
         }
 
-        // Update system info panel
+        function toggleFilter(region, btn) {
+            if (activeFilters.has(region)) {
+                activeFilters.delete(region);
+                btn.classList.remove('active');
+            } else {
+                activeFilters.add(region);
+                btn.classList.add('active');
+            }
+            updateVisibleMarkers();
+        }
+
+        // ============================================
+        // SYSTEM INFO PANEL
+        // ============================================
         function updateSystemInfo(properties) {
             const infoDiv = document.getElementById('system-info');
 
             let html = `<div class="planet-name">${properties.name || 'Unknown System'}</div>`;
 
-            if (properties.region) {
-                html += `<div class="detail"><span class="detail-label">Region:</span> ${properties.region}</div>`;
-            }
-            if (properties.sector) {
-                html += `<div class="detail"><span class="detail-label">Sector:</span> ${properties.sector}</div>`;
-            }
-            if (properties.coordinates) {
-                html += `<div class="detail"><span class="detail-label">Grid:</span> ${properties.coordinates}</div>`;
-            }
-            if (properties.climate) {
-                html += `<div class="detail"><span class="detail-label">Climate:</span> ${properties.climate}</div>`;
-            }
-            if (properties.terrain) {
-                html += `<div class="detail"><span class="detail-label">Terrain:</span> ${properties.terrain}</div>`;
-            }
-            if (properties.traderoutes) {
-                html += `<div class="detail"><span class="detail-label">Trade Routes:</span> ${properties.traderoutes}</div>`;
-            }
-            if (properties.poi) {
-                html += `<div class="detail"><span class="detail-label">Notable:</span> ${properties.poi}</div>`;
-            }
+            const fields = [
+                { key: 'region', label: 'Region' },
+                { key: 'sector', label: 'Sector' },
+                { key: 'coordinates', label: 'Grid' },
+                { key: 'climate', label: 'Climate' },
+                { key: 'terrain', label: 'Terrain' },
+                { key: 'population', label: 'Population' },
+                { key: 'traderoutes', label: 'Trade Routes' },
+                { key: 'poi', label: 'Notable' }
+            ];
+
+            fields.forEach(({ key, label }) => {
+                if (properties[key]) {
+                    html += `<div class="detail"><span class="detail-label">${label}:</span> ${properties[key]}</div>`;
+                }
+            });
+
             if (properties.description) {
-                const shortDesc = properties.description.length > 300
-                    ? properties.description.substring(0, 300) + '...'
+                const desc = properties.description.length > 350
+                    ? properties.description.substring(0, 350) + '...'
                     : properties.description;
-                html += `<div class="description">${shortDesc}</div>`;
+                html += `<div class="description">${desc}</div>`;
             }
 
             infoDiv.innerHTML = html;
         }
 
-        // Load data and create layers
-        let planetsData, hyperlanesData;
-        let planetMarkers = [];
-        let planetLabels = [];
+        // ============================================
+        // MARKER RENDERING (viewport culling)
+        // ============================================
+        function updateVisibleMarkers() {
+            if (!markersLayer) return;
 
-        Promise.all([
-            fetch('data/planets.geojson').then(r => r.json()),
-            fetch('data/hyperlanes.geojson').then(r => r.json())
-        ]).then(([planets, hyperlanes]) => {
-            planetsData = planets;
-            hyperlanesData = hyperlanes;
+            const bounds = map.getBounds();
+            const zoom = map.getZoom();
+            let visibleCount = 0;
 
-            // Update stats
-            document.getElementById('planet-count').textContent = planets.features.length.toLocaleString();
-            document.getElementById('route-count').textContent = hyperlanes.features.length;
+            markersLayer.eachLayer(marker => {
+                const props = marker.feature?.properties;
+                if (!props) return;
 
-            // Add background layers
-            createGalaxyBackground().addTo(map);
-            createGrid().addTo(map);
+                const latlng = marker.getLatLng();
+                const inBounds = bounds.contains(latlng);
+                const regionVisible = activeFilters.has(props.region);
 
-            // Add hyperlane glow layer first
-            const glowGroup = L.layerGroup();
-            hyperlanes.features.forEach(feature => {
-                if (feature.geometry.type === 'MultiLineString') {
-                    feature.geometry.coordinates.forEach(line => {
-                        const latlngs = line.map(coord => [coord[1], coord[0]]);
-                        const glow = createGlowLine(feature, latlngs);
-                        if (glow) glowGroup.addLayer(glow);
-                    });
+                if (inBounds && regionVisible) {
+                    marker.setStyle({ opacity: 1, fillOpacity: 0.8 });
+                    visibleCount++;
+                } else if (!regionVisible) {
+                    marker.setStyle({ opacity: 0, fillOpacity: 0 });
+                } else {
+                    marker.setStyle({ opacity: 0.3, fillOpacity: 0.3 });
                 }
             });
-            glowGroup.addTo(map);
 
-            // Add hyperlanes
-            L.geoJSON(hyperlanes, {
-                style: getHyperlaneStyle,
-                coordsToLatLng: function(coords) {
-                    return L.latLng(coords[1], coords[0]);
+            document.getElementById('visible-count').textContent = visibleCount.toLocaleString();
+            updateLabels();
+        }
+
+        // ============================================
+        // LABEL RENDERING (zoom-based)
+        // ============================================
+        function updateLabels() {
+            if (!labelsLayer) return;
+
+            labelsLayer.clearLayers();
+
+            const bounds = map.getBounds();
+            const zoom = map.getZoom();
+
+            planetsData.forEach(planet => {
+                const props = planet.properties;
+                if (!activeFilters.has(props.region)) return;
+
+                const intensity = props.intensity || 1;
+                let showLabel = false;
+
+                // Determine if label should show based on zoom and intensity
+                for (const [minIntensity, minZoom] of Object.entries(CONFIG.labelZoomThresholds)) {
+                    if (intensity >= parseInt(minIntensity) && zoom >= minZoom) {
+                        showLabel = true;
+                        break;
+                    }
+                }
+
+                if (!showLabel) return;
+
+                const [lng, lat] = planet.geometry.coordinates;
+                const latlng = L.latLng(lat, lng);
+
+                if (!bounds.contains(latlng)) return;
+
+                const labelClass = intensity >= 4 ? 'planet-label major' : 'planet-label';
+                const label = L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: labelClass,
+                        html: props.name,
+                        iconSize: null,
+                        iconAnchor: [-8, 4]
+                    }),
+                    interactive: false
+                });
+                labelsLayer.addLayer(label);
+            });
+        }
+
+        const debouncedUpdateMarkers = debounce(updateVisibleMarkers, 100);
+
+        // ============================================
+        // HYPERLANE RENDERING (with animation)
+        // ============================================
+        function createHyperlanes(data) {
+            // Glow layer (underneath)
+            hyperlaneGlowLayer = L.layerGroup();
+
+            // Main hyperlanes layer
+            hyperlanesLayer = L.geoJSON(data, {
+                style: feature => {
+                    const isMajor = feature.properties.size === 'Major';
+                    return {
+                        color: isMajor ? '#00d4ff' : '#3a6a7a',
+                        weight: isMajor ? 2.5 : 1.5,
+                        opacity: isMajor ? 0.85 : 0.5,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                        className: isMajor ? 'hyperlane-animated' : ''
+                    };
                 },
-                onEachFeature: function(feature, layer) {
+                coordsToLatLng: coords => L.latLng(coords[1], coords[0]),
+                onEachFeature: (feature, layer) => {
                     if (feature.properties.name) {
                         layer.bindTooltip(feature.properties.name, {
-                            className: 'hyperlane-tooltip',
+                            className: 'custom-tooltip',
                             sticky: true
                         });
                     }
                 }
-            }).addTo(map);
+            });
 
-            // Add planets
-            const planetsLayer = L.geoJSON(planets, {
-                pointToLayer: function(feature, latlng) {
-                    const marker = L.circleMarker(latlng, getPlanetMarkerOptions(feature));
-                    planetMarkers.push({ marker, feature, latlng });
+            // Create glow effect for major routes
+            data.features.forEach(feature => {
+                if (feature.properties.size !== 'Major') return;
 
-                    // Create label
-                    const label = createPlanetLabel(feature, latlng);
-                    if (label) planetLabels.push({ label, feature });
+                if (feature.geometry.type === 'MultiLineString') {
+                    feature.geometry.coordinates.forEach(line => {
+                        const latlngs = line.map(coord => [coord[1], coord[0]]);
+                        const glow = L.polyline(latlngs, {
+                            color: '#00d4ff',
+                            weight: 8,
+                            opacity: 0.12,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        });
+                        hyperlaneGlowLayer.addLayer(glow);
+                    });
+                } else if (feature.geometry.type === 'LineString') {
+                    const latlngs = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                    const glow = L.polyline(latlngs, {
+                        color: '#00d4ff',
+                        weight: 8,
+                        opacity: 0.12,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    });
+                    hyperlaneGlowLayer.addLayer(glow);
+                }
+            });
 
-                    return marker;
-                },
-                coordsToLatLng: function(coords) {
-                    return L.latLng(coords[1], coords[0]);
-                },
-                onEachFeature: function(feature, layer) {
-                    // Click handler
-                    layer.on('click', function() {
-                        updateSystemInfo(feature.properties);
+            hyperlaneGlowLayer.addTo(map);
+            hyperlanesLayer.addTo(map);
+        }
+
+        // ============================================
+        // PLANET MARKERS
+        // ============================================
+        function createPlanetMarkers(data) {
+            markersLayer = L.geoJSON(data, {
+                pointToLayer: (feature, latlng) => {
+                    const props = feature.properties;
+                    const intensity = props.intensity || 1;
+                    const color = getRegionColor(props.region);
+
+                    const marker = L.circleMarker(latlng, {
+                        radius: 2 + intensity * 1.2,
+                        fillColor: color,
+                        color: color,
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
                     });
 
-                    // Hover effect
+                    marker.feature = feature;
+                    return marker;
+                },
+                coordsToLatLng: coords => L.latLng(coords[1], coords[0]),
+                onEachFeature: (feature, layer) => {
+                    layer.on('click', () => updateSystemInfo(feature.properties));
+
                     layer.on('mouseover', function() {
-                        this.setStyle({
-                            weight: 3,
-                            fillOpacity: 1
-                        });
+                        this.setStyle({ weight: 3, fillOpacity: 1 });
                         this.bringToFront();
                     });
 
                     layer.on('mouseout', function() {
-                        const opts = getPlanetMarkerOptions(feature);
-                        this.setStyle({
-                            weight: opts.weight,
-                            fillOpacity: opts.fillOpacity
-                        });
+                        this.setStyle({ weight: 1, fillOpacity: 0.8 });
                     });
 
-                    // Tooltip
-                    const region = feature.properties.region || 'Unknown';
+                    const props = feature.properties;
                     layer.bindTooltip(`
-                        <div class="popup-title">${feature.properties.name}</div>
-                        <div class="popup-detail"><span>Region:</span> ${region}</div>
-                        ${feature.properties.sector ? `<div class="popup-detail"><span>Sector:</span> ${feature.properties.sector}</div>` : ''}
+                        <div class="popup-title">${props.name}</div>
+                        <div class="popup-detail"><span>Region:</span> ${props.region || 'Unknown'}</div>
+                        ${props.sector ? `<div class="popup-detail"><span>Sector:</span> ${props.sector}</div>` : ''}
                     `, {
-                        className: 'hyperlane-tooltip',
+                        className: 'custom-tooltip',
                         direction: 'top',
                         offset: [0, -5]
                     });
                 }
-            }).addTo(map);
-
-            // Labels layer
-            const labelsLayer = L.layerGroup();
-            planetLabels.forEach(item => {
-                labelsLayer.addLayer(item.label);
-            });
-            labelsLayer.addTo(map);
-
-            // Dynamic label visibility based on zoom
-            map.on('zoomend', function() {
-                const zoom = map.getZoom();
-
-                labelsLayer.clearLayers();
-
-                planetLabels.forEach(item => {
-                    const intensity = item.feature.properties.intensity || 1;
-                    let showLabel = false;
-
-                    if (zoom >= 6) showLabel = intensity >= 1;
-                    else if (zoom >= 5) showLabel = intensity >= 2;
-                    else if (zoom >= 4) showLabel = intensity >= 3;
-                    else if (zoom >= 3) showLabel = intensity >= 4;
-                    else showLabel = intensity >= 5;
-
-                    if (showLabel) {
-                        labelsLayer.addLayer(item.label);
-                    }
-                });
             });
 
-            // Hide loading screen
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-            }, 500);
-        });
+            markersLayer.addTo(map);
+        }
 
-        // Update coordinates display on mouse move
+        // ============================================
+        // MAP EVENTS
+        // ============================================
+        map.on('moveend', debouncedUpdateMarkers);
+        map.on('zoomend', debouncedUpdateMarkers);
+
         map.on('mousemove', function(e) {
             const lat = e.latlng.lat.toFixed(2);
             const lng = e.latlng.lng.toFixed(2);
             document.getElementById('coords').textContent = `COORDS: ${lng}, ${lat}`;
         });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function init() {
+            updateLoadingBar(10);
+
+            try {
+                // Load data
+                const [planetsResponse, hyperlanesResponse] = await Promise.all([
+                    fetch('data/planets.geojson'),
+                    fetch('data/hyperlanes.geojson')
+                ]);
+
+                updateLoadingBar(40);
+
+                const planets = await planetsResponse.json();
+                const hyperlanes = await hyperlanesResponse.json();
+
+                updateLoadingBar(60);
+
+                planetsData = planets.features;
+                hyperlanesData = hyperlanes.features;
+
+                // Update stats
+                document.getElementById('planet-count').textContent = planetsData.length.toLocaleString();
+                document.getElementById('route-count').textContent = hyperlanesData.length;
+
+                // Setup UI
+                setupQuickJumps();
+                setupFilters();
+
+                updateLoadingBar(70);
+
+                // Create layers
+                labelsLayer = L.layerGroup().addTo(map);
+
+                createHyperlanes(hyperlanes);
+                updateLoadingBar(85);
+
+                createPlanetMarkers(planets);
+                updateLoadingBar(95);
+
+                // Initial render
+                updateVisibleMarkers();
+
+                updateLoadingBar(100);
+
+                // Hide loading screen
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('hidden');
+                }, 300);
+
+            } catch (error) {
+                console.error('Failed to load galactic data:', error);
+                document.querySelector('.loading-text').textContent = 'Error loading data...';
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>
